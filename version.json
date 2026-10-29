@@ -1,13 +1,9 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "3c35abae3e5f4fb7643a3b2cf33e4c7d829d90f05fd9ed77c50ed57cf012aa35",
+  "sha256": "d071a7a75b0fb678f100fd363215bdd5f6b61eca154426630d6a91c26923337b",
   "notes": [
-    "One-click updates. Junkyard tells you when a new version is out and installs it for you.",
-    "A What's new window, shown once after each update.",
-    "Restored clips now go into a 'Junkyard Restored' bin so they're easy to review.",
-    "Find junk in the Media Pool (flags or clip colours) or a Timeline (clip colours).",
-    "Junkyard remembers your junk colour for each mode.",
-    "Fixes: Burn Pile can be run on its own, results stay on screen, tidier layout."
+    "Fixed: the Junkyard window could open too narrow.",
+    "The Report tab now shows where Junkyard is installed."
   ]
 }

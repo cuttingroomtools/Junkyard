@@ -65,12 +65,13 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.2.0"
+APP_VERSION = "1.2.1"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
 LOG_NAME = "junkyard_log.csv"
 TRACK_TYPES = ("video", "audio")
+WIN_W, WIN_H = 860, 760
 IS_MAC = sys.platform == "darwin"
 
 if IS_MAC:
@@ -457,6 +458,10 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.2.1", [
+        "Fixed: the Junkyard window could open too narrow.",
+        "The Report tab now shows where Junkyard is installed.",
+    ]),
     ("1.2.0", [
         "One-click updates. Junkyard tells you when a new version is out and installs it for you.",
         "This What's new window, shown once after each update.",
@@ -700,7 +705,7 @@ class Junkyard(object):
 
         self.win = self.disp.AddWindow(
             {"ID": "JunkyardWin", "WindowTitle": "%s %s" % (APP_TITLE, APP_VERSION),
-             "Geometry": [200, 120, 860, 720]},
+             "Geometry": [200, 120, WIN_W, WIN_H], "MinimumSize": [780, 660]},
             ui.VGroup({"Spacing": 6}, [
                 ui.HGroup({"Weight": 0, "Spacing": 8}, [
                     ui.Label({"ID": "UpdateMsg", "Weight": 1, "WordWrap": True, "Text": ""}),
@@ -1566,6 +1571,8 @@ class Junkyard(object):
         elif self.settings.get("last_check"):
             when = datetime.datetime.fromtimestamp(self.settings["last_check"]).strftime("%d %b %H:%M")
             text += " Last checked %s." % when
+        if path:
+            text += "<br><span style='color:#7d7d7d'>Installed at %s</span>" % path
         self.it["VersionInfo"].Text = text
         self.it["AutoCheck"].Checked = bool(self.settings.get("auto_update", True))
 
@@ -1661,6 +1668,10 @@ class Junkyard(object):
 
     def show(self):
         self.win.Show()
+        try:
+            self.win.Resize([WIN_W, WIN_H])   # hiding the update bar can shrink the window
+        except Exception:
+            pass
         try:
             self.after_open()
         except Exception as e:
