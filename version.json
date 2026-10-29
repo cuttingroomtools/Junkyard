@@ -1,9 +1,10 @@
 {
-  "version": "1.2.2",
+  "version": "1.2.3",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "3da09adb7d55c2f690fd238dc6dd73bd70f73ca1f0f03fd6cf5d431b9fbb6998",
+  "sha256": "8e3f592c78b7c020322a3120948e7bffa94f4d0f096799d11fd01aceba809968",
   "notes": [
-    "Fixed: the Junkyard window opening too narrow.",
-    "The Report tab now shows where Junkyard is installed."
+    "Restore now tidies up: empty junkyard folders are removed and the log is kept in Junkyard's own folder.",
+    "The junk list is sorted A to Z.",
+    "The install location on the Report tab is no longer cut off."
   ]
 }

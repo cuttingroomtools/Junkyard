@@ -65,7 +65,7 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.2.2"
+APP_VERSION = "1.2.3"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
@@ -458,6 +458,11 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.2.3", [
+        "Restore now tidies up: empty junkyard folders are removed and the log is kept in Junkyard's own folder.",
+        "The junk list is sorted A to Z.",
+        "The install location on the Report tab is no longer cut off.",
+    ]),
     ("1.2.2", [
         "Fixed: the Junkyard window opening too narrow (for real this time).",
     ]),
@@ -578,6 +583,35 @@ def install_update(info, path):
                   % info["version"])
 
 
+def tidy_after_restore(log_path):
+    """Keep the log in Junkyard's own folder and remove the junkyard folders the restore emptied."""
+    run_dir = os.path.dirname(log_path)
+    try:
+        keep = os.path.join(APP_DIR, "restored_logs")
+        os.makedirs(keep, exist_ok=True)
+        shutil.move(log_path, os.path.join(keep, "%s_%s_RESTORED.csv"
+                                           % (os.path.basename(run_dir), os.path.basename(log_path)[:-4])))
+    except Exception:
+        try:
+            os.rename(log_path, log_path.replace(".csv", "_RESTORED.csv"))
+        except Exception:
+            pass
+        return
+    folders = [run_dir]
+    if os.path.basename(os.path.dirname(run_dir)) == YARD_FOLDER_NAME:
+        folders.append(os.path.dirname(run_dir))      # the _JUNKYARD folder itself, if now empty
+    for folder in folders:
+        for root, dirs, files in os.walk(folder, topdown=False):
+            names = [n for n in os.listdir(root) if n != ".DS_Store"]
+            if not names:
+                try:
+                    if os.path.exists(os.path.join(root, ".DS_Store")):
+                        os.remove(os.path.join(root, ".DS_Store"))   # Finder's view settings only
+                    os.rmdir(root)
+                except Exception:
+                    pass
+
+
 def notes_since(seen):
     """Release notes newer than the version last seen, newest first."""
     return [(v, n) for v, n in RELEASE_NOTES
@@ -693,6 +727,7 @@ class Junkyard(object):
                 ui.Button({"ID": "WhatsNew", "Text": "What's new", "Weight": 0, "ToolTip": "See what changed in this version."}),
                 ui.Button({"ID": "CheckNow", "Text": "Check for updates", "Weight": 0, "ToolTip": "Look for a newer version of Junkyard now."}),
             ]),
+            ui.Label({"ID": "InstallInfo", "Weight": 0, "WordWrap": True, "Text": ""}),
             ui.CheckBox({"ID": "AutoCheck", "Weight": 0, "Text": "Check for updates when Junkyard opens",
                          "ToolTip": "Junkyard looks for a new version at most twice a day. It only reads the version number; nothing about you or your projects is sent."}),
             ui.Label({"Weight": 0, "Text": "<span style='color:#7d7d7d'>© 2026 Joel McDowell. Free to use. All rights reserved.</span>"}),
@@ -1046,6 +1081,10 @@ class Junkyard(object):
                         % (where, colour, kind))
         else:
             self.status("Untick anything you want to keep, pick what to do, then Run.")
+            try:
+                tree.SortByColumn(0, "AscendingOrder")     # A to Z by clip name
+            except Exception:
+                pass
         self.update_totals()
 
     def checked_rows(self):
@@ -1493,10 +1532,7 @@ class Junkyard(object):
                         safe_call(mpi, "LinkProxyMedia", kinds["proxy"][0])
 
         for log_path in last.get("logs", []):
-            try:
-                os.rename(log_path, log_path.replace(".csv", "_RESTORED.csv"))
-            except Exception:
-                pass
+            tidy_after_restore(log_path)
         ledger_add({"when": now_stamp(), "project": last.get("project"), "action": "restore",
                     "clips": -len([c for c in restored.values() if "clip" in c]),
                     "bytes": -freed_back, "destination": ""})
@@ -1574,9 +1610,10 @@ class Junkyard(object):
         elif self.settings.get("last_check"):
             when = datetime.datetime.fromtimestamp(self.settings["last_check"]).strftime("%d %b %H:%M")
             text += " Last checked %s." % when
-        if path:
-            text += "<br><span style='color:#7d7d7d'>Installed at %s</span>" % path
         self.it["VersionInfo"].Text = text
+        home = os.path.expanduser("~")
+        shown = ("~" + path[len(home):]) if path and path.startswith(home) else (path or "not found")
+        self.it["InstallInfo"].Text = "<span style='color:#7d7d7d'>Installed at %s</span>" % shown
         self.it["AutoCheck"].Checked = bool(self.settings.get("auto_update", True))
 
     def on_autocheck(self, ev):
