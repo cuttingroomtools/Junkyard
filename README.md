@@ -31,7 +31,7 @@ Junkyard checks for a new version when it opens and installs it with one click. 
 
 ## Safety
 
-Junkyard only moves files unless you choose Burn Pile, which asks you to type BURN first. Test it on a copy of a project before using it on real work, and keep backups of footage you care about.
+Junkyard only moves files unless you choose Burn Pile, which asks you to type FUCK IT first. Test it on a copy of a project before using it on real work, and keep backups of footage you care about.
 
 ---
 

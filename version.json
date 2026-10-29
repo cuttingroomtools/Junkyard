@@ -1,10 +1,9 @@
 {
-  "version": "1.2.3",
+  "version": "1.2.4",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "8e3f592c78b7c020322a3120948e7bffa94f4d0f096799d11fd01aceba809968",
+  "sha256": "08d19d5dbfc9b818f813d5980e82a0185bca415e80dfcf0826bbc140ae8f818b",
   "notes": [
-    "Restore now tidies up: empty junkyard folders are removed and the log is kept in Junkyard's own folder.",
-    "The junk list is sorted A to Z.",
-    "The install location on the Report tab is no longer cut off."
+    "🔥 Burn Pile now asks you to type FUCK IT before it deletes anything.",
+    "⚠️ A bit more attitude in the warnings."
   ]
 }

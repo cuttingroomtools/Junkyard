@@ -21,7 +21,7 @@ Every option starts OFF. You choose what happens:
       folder you choose). Folder structure is kept; a log is written.
     - Or move to the Trash (macOS; Finder's Put Back works).
     - Or Burn Pile: delete permanently. Skips the Trash, can't be restored,
-      and asks you to type BURN in a pop-up first. Clips used in other
+      and asks you to type FUCK IT in a pop-up first. Clips used in other
       timelines are never burned.
     - Include sidecars and proxies (camera XML/LRV/THM/SRT etc. and
       linked proxy media).
@@ -35,7 +35,7 @@ Every option starts OFF. You choose what happens:
 Safety
 ------
 - Nothing is permanently deleted unless you choose Burn Pile, tick it,
-  click Run, Confirm, then type BURN in the pop-up.
+  click Run, Confirm, then type FUCK IT in the pop-up.
 - Clips used in other timelines start unticked and are marked in orange.
   If you tick one anyway it is never removed from the Media Pool.
 - Restore tab: puts the last run's files back and relinks or re-imports
@@ -65,13 +65,14 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.2.3"
+APP_VERSION = "1.2.4"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
 LOG_NAME = "junkyard_log.csv"
 TRACK_TYPES = ("video", "audio")
 WIN_W, WIN_H = 860, 760
+BURN_PHRASE = "FUCK IT"     # what you type to confirm a Burn Pile run
 IS_MAC = sys.platform == "darwin"
 
 if IS_MAC:
@@ -165,6 +166,11 @@ def human(n):
             return "%s%.1f %s" % (sign, n, unit)
         n /= 1024.0
     return "%s%.1f PB" % (sign, n)
+
+
+def burn_ok(text):
+    """True when the typed confirmation matches BURN_PHRASE (case and extra spaces ignored)."""
+    return " ".join((text or "").upper().split()) == BURN_PHRASE
 
 
 def plural(n, word):
@@ -458,6 +464,10 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.2.4", [
+        "🔥 Burn Pile now asks you to type FUCK IT before it deletes anything.",
+        "⚠️ A bit more attitude in the warnings.",
+    ]),
     ("1.2.3", [
         "Restore now tidies up: empty junkyard folders are removed and the log is kept in Junkyard's own folder.",
         "The junk list is sorted A to Z.",
@@ -675,12 +685,12 @@ class Junkyard(object):
                 ui.Button({"ID": "DefaultDest", "Text": "Default", "Weight": 0, "ToolTip": "Go back to _JUNKYARD next to the media."}),
             ]),
             ui.CheckBox({"ID": "Trash", "Weight": 0, "ToolTip": "Moves the files to the Mac Trash instead. Finder's Put Back still works until you empty the Trash.",
-                         "Text": "Move to the Trash instead" + ("" if IS_MAC else " (macOS only)")}),
+                         "Text": "🗑️ Move to the Trash instead" + ("" if IS_MAC else " (macOS only)")}),
             ui.HGroup({"Weight": 0}, [
-                ui.CheckBox({"ID": "Burn", "Weight": 0, "ToolTip": "Deletes the files permanently. They skip the Trash and can't be restored. You'll be asked to type BURN to confirm. Clips used in other timelines are never burned.",
-                             "Text": "Burn Pile: delete permanently"}),
+                ui.CheckBox({"ID": "Burn", "Weight": 0, "ToolTip": "Deletes the files permanently. They skip the Trash and can't be restored. You'll be asked to type FUCK IT to confirm. Clips used in other timelines are never burned.",
+                             "Text": "🔥 Burn Pile: delete permanently"}),
                 ui.Label({"ID": "BurnWarn", "Weight": 1,
-                          "Text": "<span style='color:#E5533D'><b>⚠ Can't be undone. No Restore.</b></span>"}),
+                          "Text": "<span style='color:#E5533D'><b>⚠️ Can't be undone. No Restore. ☠️</b></span>"}),
             ]),
             ui.CheckBox({"ID": "Extras", "Weight": 0, "ToolTip": "Also moves camera sidecar files (Sony XML, GoPro LRV/THM, DJI SRT) and any linked proxy media with each clip.",
                          "Text": "Include sidecars and proxies (XML, LRV, THM, SRT, proxy media)"}),
@@ -1055,7 +1065,7 @@ class Junkyard(object):
             item = tree.NewItem()
             item.Text[0] = os.path.basename(p)
             item.Text[1] = human(size_of(p)) if exists else "offline"
-            item.Text[2] = ("⚠ " + use_text) if use_text else "—"
+            item.Text[2] = ("⚠️ " + use_text) if use_text else "—"
             item.Text[3] = os.path.dirname(p)
             item.CheckState[0] = "Unchecked" if (use_text or not exists) else "Checked"
             if use_text:
@@ -1211,29 +1221,29 @@ class Junkyard(object):
         ui = self.ui
         self.it["Run"].Enabled = False
         dlg = self.disp.AddWindow(
-            {"ID": "BurnDlg", "WindowTitle": "Burn Pile", "Geometry": [320, 220, 560, 380]},
+            {"ID": "BurnDlg", "WindowTitle": "🔥 Burn Pile", "Geometry": [320, 220, 560, 380]},
             ui.VGroup({"Spacing": 10}, [
                 ui.Label({"Weight": 0, "WordWrap": True, "MinimumSize": [0, 30], "Text":
-                          "<span style='color:#E5533D; font-size:15px'><b>Permanently delete %s (%s)?</b></span>"
+                          "<span style='color:#E5533D; font-size:15px'><b>☠️ Permanently delete %s (%s)?</b></span>"
                           % (plural(len(burnable), "file"), human(size))}),
                 ui.Label({"Weight": 0, "WordWrap": True, "MinimumSize": [0, 48], "Text":
-                          "These files skip the Trash and can't be restored by Junkyard. "
-                          "Make sure you have a backup if there's any doubt."}),
+                          "⚠️ These files skip the Trash and can't be restored by Junkyard. "
+                          "No take-backs. Make sure you have a backup if there's any doubt."}),
                 ui.Label({"Weight": 1, "WordWrap": True, "MinimumSize": [0, 40],
                           "Alignment": {"AlignTop": True}, "Text": "<i>%s</i>" % shown}),
-                ui.Label({"Weight": 0, "MinimumSize": [0, 24], "Text": "Type <b>BURN</b> to confirm:"}),
-                ui.LineEdit({"ID": "BurnText", "Weight": 0, "PlaceholderText": "BURN"}),
+                ui.Label({"Weight": 0, "MinimumSize": [0, 24], "Text": "Sure? Type <b>%s</b> to confirm:" % BURN_PHRASE}),
+                ui.LineEdit({"ID": "BurnText", "Weight": 0, "PlaceholderText": BURN_PHRASE}),
                 ui.HGroup({"Weight": 0}, [
                     ui.HGap(0, 1),
                     ui.Button({"ID": "BurnCancel", "Text": "Cancel", "Weight": 0}),
-                    ui.Button({"ID": "BurnGo", "Text": "Burn forever", "Weight": 0,
+                    ui.Button({"ID": "BurnGo", "Text": "🔥 Burn forever", "Weight": 0,
                                "Enabled": False, "MinimumSize": [130, 30]}),
                 ]),
             ]))
         di = dlg.GetItems()
 
         def typed(ev):
-            di["BurnGo"].Enabled = (di["BurnText"].Text or "").strip() == "BURN"
+            di["BurnGo"].Enabled = burn_ok(di["BurnText"].Text)
 
         def close(ev=None):
             dlg.Hide()
@@ -1241,7 +1251,7 @@ class Junkyard(object):
             self.status("Burn cancelled. Nothing was deleted.")
 
         def go(ev):
-            if (di["BurnText"].Text or "").strip() != "BURN":
+            if not burn_ok(di["BurnText"].Text):
                 return
             dlg.Hide()
             msg = self.execute(sel, o)
@@ -1277,14 +1287,14 @@ class Junkyard(object):
         text = "%s: %s." % (plural(len(sel), "clip"), "; ".join(steps))
         risky = [r for r in sel if r["used"]]
         if risky and o["Burn"]:
-            text += "\n⚠ %d ticked clip(s) are used in other timelines, so they won't be burned." % len(risky)
+            text += "\n⚠️ %d ticked clip(s) are used in other timelines, so they won't be burned." % len(risky)
         elif risky:
-            text += "\n⚠ %d ticked clip(s) are used in other timelines and will stay in the Media Pool" % len(risky)
+            text += "\n⚠️ %d ticked clip(s) are used in other timelines and will stay in the Media Pool" % len(risky)
             text += (", but those edits will go offline." if o["files"] and not o["Relink"] else ".")
         if o["CloseGaps"]:
             text += "\nRestore can't undo the timeline cut."
         if o["Burn"]:
-            return text + "\nClick Confirm, then type BURN in the pop-up."
+            return text + "\n🔥 Click Confirm, then type %s in the pop-up." % BURN_PHRASE
         return text + "\nClick Confirm to go."
 
     def execute(self, sel, o):
@@ -1381,7 +1391,7 @@ class Junkyard(object):
                             safe_call(mpi, "LinkProxyMedia", moved_proxy[r["path"]])
             notes.append("relinked %d clips" % n)
             if offline:
-                notes.append("⚠ couldn't relink %s (they'll show offline)" % ", ".join(offline))
+                notes.append("⚠️ couldn't relink %s (they'll show offline)" % ", ".join(offline))
 
         # 4. JUNK bin
         if o["ToBin"]:
@@ -1427,9 +1437,9 @@ class Junkyard(object):
 
         text = "Done: " + "; ".join(notes) + "."
         if protected:
-            text += "\n⚠ Not burned (used in other timelines): " + ", ".join(protected)
+            text += "\n⚠️ Not burned (used in other timelines): " + ", ".join(protected)
         if failed:
-            text += "\n⚠ Couldn't move: " + ", ".join(failed)
+            text += "\n⚠️ Couldn't move: " + ", ".join(failed)
         return text
 
     # ------------------------------------------------------------------ restore
@@ -1544,7 +1554,7 @@ class Junkyard(object):
             text += "; re-imported %d into the '%s' bin" % (len(to_import), RESTORE_BIN_NAME)
         text += "."
         if skipped:
-            text += "\n⚠ Skipped: " + ", ".join(skipped)
+            text += "\n⚠️ Skipped: " + ", ".join(skipped)
         return text
 
     # ------------------------------------------------------------------ report
