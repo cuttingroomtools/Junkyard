@@ -65,7 +65,7 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.2.1"
+APP_VERSION = "1.2.2"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
@@ -458,8 +458,11 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.2.2", [
+        "Fixed: the Junkyard window opening too narrow (for real this time).",
+    ]),
     ("1.2.1", [
-        "Fixed: the Junkyard window could open too narrow.",
+        "Tried to fix the narrow window (properly fixed in 1.2.2).",
         "The Report tab now shows where Junkyard is installed.",
     ]),
     ("1.2.0", [
@@ -762,7 +765,7 @@ class Junkyard(object):
         self.it["Dest"].Text = s.get("dest", "") or ""
         for cid in OPTION_IDS:
             self.it[cid].Checked = False          # every option starts off
-        self.set_update_bar("", False)
+        pass  # bar is hidden after the window opens (hiding first shrinks it)
         self.apply_rules()
 
     def in_timeline(self):
@@ -1668,10 +1671,7 @@ class Junkyard(object):
 
     def show(self):
         self.win.Show()
-        try:
-            self.win.Resize([WIN_W, WIN_H])   # hiding the update bar can shrink the window
-        except Exception:
-            pass
+        self.set_update_bar("", False)        # only after Show: hiding earlier shrinks the window
         try:
             self.after_open()
         except Exception as e:

@@ -11,7 +11,7 @@ Flag your junk footage in DaVinci Resolve Studio, then send the source files to 
 
 ## Install (Mac)
 
-1. Download **[Junkyard.py](https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py)** (right-click the link and choose *Download Linked File*).
+1. Click **Junkyard.py** in the file list above, then click the **Download raw file** button (the ⬇ arrow at the top right of the code). Don't use *Save Page As*, which saves the web page instead of the script.
 2. In Finder press **Cmd + Shift + G**, paste this path and press Return:
    `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Edit/`
    (If the `Edit` folder isn't there, create it inside `Scripts`.)

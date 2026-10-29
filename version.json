@@ -1,9 +1,9 @@
 {
-  "version": "1.2.1",
+  "version": "1.2.2",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "d071a7a75b0fb678f100fd363215bdd5f6b61eca154426630d6a91c26923337b",
+  "sha256": "3da09adb7d55c2f690fd238dc6dd73bd70f73ca1f0f03fd6cf5d431b9fbb6998",
   "notes": [
-    "Fixed: the Junkyard window could open too narrow.",
+    "Fixed: the Junkyard window opening too narrow.",
     "The Report tab now shows where Junkyard is installed."
   ]
 }
