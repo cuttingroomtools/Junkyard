@@ -1,9 +1,9 @@
 {
-  "version": "1.2.4",
+  "version": "1.2.5",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "08d19d5dbfc9b818f813d5980e82a0185bca415e80dfcf0826bbc140ae8f818b",
+  "sha256": "cbb5173325514727aa5e0331327eef9735c777355208caff13d45328fa3a90d2",
   "notes": [
-    "🔥 Burn Pile now asks you to type FUCK IT before it deletes anything.",
-    "⚠️ A bit more attitude in the warnings."
+    "A quick How to use guide opens with Junkyard. Tick \"Don't show this again\" to hide it.",
+    "Bring the guide back any time with the How to use button on the Report tab."
   ]
 }

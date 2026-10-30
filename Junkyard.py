@@ -65,7 +65,7 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.2.4"
+APP_VERSION = "1.2.5"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
@@ -105,6 +105,7 @@ DEFAULTS = {
     "last_run": None,
     "auto_update": True,
     "seen_version": None,
+    "hide_guide": False,
     "last_check": 0,
     "latest": None,
 }
@@ -464,6 +465,10 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.2.5", [
+        "A quick How to use guide opens with Junkyard. Tick \"Don't show this again\" to hide it.",
+        "Bring the guide back any time with the How to use button on the Report tab.",
+    ]),
     ("1.2.4", [
         "🔥 Burn Pile now asks you to type FUCK IT before it deletes anything.",
         "⚠️ A bit more attitude in the warnings.",
@@ -622,6 +627,24 @@ def tidy_after_restore(log_path):
                     pass
 
 
+GUIDE_HTML = """
+<h2>How to use Junkyard</h2>
+<p><b>1. Flag your junk.</b> In the Media Pool, right-click a clip › Flags › <b>Cocoa</b>.
+You can pick a different flag or a clip colour at the top of the Yard tab.
+On a timeline, Resolve only allows clip colours, so set <i>Find junk in</i> to Timeline and use a colour.</p>
+<p><b>2. Check the list.</b> Pick your all-footage timeline and hit <b>Refresh</b>.
+Clips used in another timeline show in <span style='color:#E8833A'>orange</span> and start unticked.
+Untick anything you want to keep.</p>
+<p><b>3. Choose what happens.</b> Every option starts off. <b>Move to junkyard folder</b> is the safe choice:
+the files go to a <i>_JUNKYARD</i> folder next to your media for a final look.
+Hover over any option to see what it does.</p>
+<p><b>4. Run, then Confirm.</b> The first click shows exactly what will happen. Nothing moves until you confirm.</p>
+<p><b>5. Changed your mind?</b> The <b>Restore</b> tab puts the last run's files back.</p>
+<p>🔥 <b>Burn Pile</b> deletes files for good, with no Restore. You'll have to type <b>FUCK IT</b> first.</p>
+<p style='color:#7d7d7d'>Test on a copy of a project first, and keep backups of footage you care about.</p>
+"""
+
+
 def notes_since(seen):
     """Release notes newer than the version last seen, newest first."""
     return [(v, n) for v, n in RELEASE_NOTES
@@ -734,6 +757,7 @@ class Junkyard(object):
             heading("Updates"),
             ui.HGroup({"Weight": 0, "Spacing": 8}, [
                 ui.Label({"ID": "VersionInfo", "Weight": 1, "WordWrap": True, "Text": ""}),
+                ui.Button({"ID": "HowTo", "Text": "How to use", "Weight": 0, "ToolTip": "Show the quick guide to using Junkyard."}),
                 ui.Button({"ID": "WhatsNew", "Text": "What's new", "Weight": 0, "ToolTip": "See what changed in this version."}),
                 ui.Button({"ID": "CheckNow", "Text": "Check for updates", "Weight": 0, "ToolTip": "Look for a newer version of Junkyard now."}),
             ]),
@@ -891,6 +915,7 @@ class Junkyard(object):
         on.UpdateGo.Clicked = self.on_update
         on.UpdateNotes.Clicked = lambda ev: self.show_notes(remote=True)
         on.WhatsNew.Clicked = lambda ev: self.show_notes(everything=True)
+        on.HowTo.Clicked = lambda ev: self.show_guide()
         on.CheckNow.Clicked = lambda ev: self.check_updates(force=True)
         on.AutoCheck.Clicked = self.on_autocheck
 
@@ -1673,13 +1698,13 @@ class Junkyard(object):
         ok, msg = install_update(info, path)
         self.set_update_bar(("<b>%s</b>" % msg) if ok else msg, False)
 
-    def show_notes(self, remote=False, everything=False, first_run=False):
+    def show_notes(self, remote=False, everything=False, first_run=False, since=None):
         if remote and self.newer():
             info = self.newer()
             items = [(info["version"], info.get("notes") or ["No notes for this version."])]
             title = "Coming in Junkyard %s" % info["version"]
         else:
-            items = RELEASE_NOTES if everything else notes_since(self.settings.get("seen_version"))
+            items = RELEASE_NOTES if everything else notes_since(since if since is not None else self.settings.get("seen_version"))
             title = ("Welcome to Junkyard %s" % APP_VERSION if first_run
                      else "What's new in Junkyard %s" % APP_VERSION)
         if not items:
@@ -1706,12 +1731,46 @@ class Junkyard(object):
         self.notes_items["NotesText"].HTML = html
         self.notes_win.Show()
 
+    def show_guide(self):
+        ui = self.ui
+        if getattr(self, "guide_win", None) is None:
+            self.guide_win = self.disp.AddWindow(
+                {"ID": "GuideWin", "WindowTitle": "How to use Junkyard", "Geometry": [340, 180, 560, 520]},
+                ui.VGroup({"Spacing": 10}, [
+                    ui.TextEdit({"ID": "GuideText", "ReadOnly": True, "Weight": 1}),
+                    ui.HGroup({"Weight": 0}, [
+                        ui.CheckBox({"ID": "GuideHide", "Text": "Don't show this again", "Weight": 0,
+                                     "ToolTip": "You can always open this guide again from the Report tab."}),
+                        ui.HGap(0, 1),
+                        ui.Button({"ID": "GuideOK", "Text": "Got it", "Weight": 0, "MinimumSize": [110, 30]}),
+                    ]),
+                ]))
+            gi = self.guide_win.GetItems()
+            self.guide_items = gi
+
+            def close(ev=None):
+                self.settings["hide_guide"] = bool(gi["GuideHide"].Checked)
+                save_settings(self.settings)
+                self.guide_win.Hide()
+
+            self.guide_win.On.GuideOK.Clicked = close
+            self.guide_win.On.GuideWin.Close = close
+        self.guide_items["GuideText"].HTML = GUIDE_HTML
+        self.guide_items["GuideHide"].Checked = bool(self.settings.get("hide_guide"))
+        self.guide_win.Show()
+
     def after_open(self):
         s = self.settings
-        if s.get("seen_version") != APP_VERSION:
-            self.show_notes(first_run=not s.get("seen_version"))
+        seen = s.get("seen_version")
+        if seen != APP_VERSION:
             s["seen_version"] = APP_VERSION
             save_settings(s)
+        if seen is None:
+            self.show_guide()                     # first install: the guide is the welcome
+        elif seen != APP_VERSION:
+            self.show_notes(since=seen)           # after an update: just what's new
+        elif not s.get("hide_guide"):
+            self.show_guide()
         self.check_updates()
 
     # ------------------------------------------------------------------ go
@@ -1727,6 +1786,8 @@ class Junkyard(object):
         self.win.Hide()
         if getattr(self, "notes_win", None) is not None:
             self.notes_win.Hide()
+        if getattr(self, "guide_win", None) is not None:
+            self.guide_win.Hide()
 
 
 def main():
