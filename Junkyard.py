@@ -65,13 +65,13 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.2.6"
+APP_VERSION = "1.2.7"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
 LOG_NAME = "junkyard_log.csv"
 TRACK_TYPES = ("video", "audio")
-WIN_W, WIN_H = 860, 760
+WIN_W, WIN_H = 860, 800
 BURN_PHRASE = "FUCK IT"     # what you type to confirm a Burn Pile run
 IS_MAC = sys.platform == "darwin"
 
@@ -115,6 +115,7 @@ MUTED = "#9C9C9C"
 
 # Tab icons (48px PNG, base64)
 ICONS = {
+    "logo": "iVBORw0KGgoAAAANSUhEUgAAAOwAAAA8CAYAAABl7VY7AAAQAElEQVR4AeydCZgcRRXHq2cREMGQzxA2oOJBhKAmnJJdbrmRIJFbISAE5JJDNAbCLpsDCCDHJ3xGo0IAxRjAA0nk1EQkG+DjlEsQRAlkN4kcURICyba//7Az6empmumezE52NrXf+09Vv3r1uvp1ve66ujZj/J+3gLdA3VjAO2zd3CpfUG8BY7zD+lrgLVBHFvAOW0c3yxfVW8A7bOV1wOf0Fqi5BbzD1tzk/oTeApVbwDts5bbzOb0Fam4B77A1N7k/obdA5RZYLYcNw7BfGIafrPz0PudaagF/2RVaoGKHxVFHc85F4BXiVxN68hbwFuhhC1TssJRrDPgQCMBonHZdQk/eAt4CPWiB1XHYhki5lgZB8F7kOHUUh18fDAE7g81TK/AZvAXWAgusjsMui9hnFk52AWgFp4B9wTbgwxEZaxSZEeAPJErfs4TzwHx4y8AD4FIwEgyEnyeOB4ODwc/Am+B5MAO0gN3ygj7iLdCHLJAxJv3V4BBy9MGRnCcQvxiMBz8B94BnwFJk5UjTCM8DR4L9wKlgCngdmX+Dg0Gc1oexKxgLfgM6kc8Txy8AOfpJhBuDrcARYALYDHjyFuhzFpDjVXJRQ8iUtM8qRzoe+R+AX4O7wRRwKhgEPgHkfARVoZk0z3WeqijzSrwFepMFKnXYoVW8iGHoegpUg95AyYnAk7dAn7RAb3DYHbHsv0A16Ezergurocjr8BbojRao1GH1Vkx6PW8iOBu8CGykEeHHbQnw2sFN4GVQjtQU/lU5oeqme23eArW1QKUOm6ZJ/BJvvb24rAuBjbaA6XrDfpw0NXGPJhTty4/mfuXIRPP0NjHJEXjyFui7FkjtsAzT9scceisSJCINKknQ5ZSarvkfAktBnJR3NA7/CAmjCO8jnAyaQJTOIM03haMW8fE+aYHUDosVtgVpaCBOvg4ZXA5Lkmnmx9XsHUf+dXHImwlHIHceiFPSEet4vro7fmPyDv0WTtx5cOekpubOiU2HdkxsPrljwvALOsc3Hxa27Sk71901+QInt0AlDpu0/6qFEOqbauniFjhcB8XqAjZS0/dRWwI8vWU1H0vUaDpIYRzX4sx9+iOEjknDj1owoenV995f760u0/BCGAYPhib4LYaYaoLMxWHG3NaZeVfLRWHVA/kyVmKBShw2af/1tCAItqdQ3wSv41BazOA6n97acm5ErbSI/HJ86bAJfARmnx5wCrsyNPvNpqExs0IT3mjCcDLhmEzQdQKG2R/+m6EJDsUOnvqwBVwOVOqSk75htaRQK4/+ibJRYC5wkR4CpfqgV5HxOhAAFzXj1N91JdY7PwhM/9CYJY0r3xq5fhBc1JDJ3J7pMtn56y4TDgvCsMEEpsH4vz5tgVQOi0NI/gsJLaJVTDOQ1ZTOjwk1GkxgJQ1ibUSKZAmKaB84p4NydAVl3LqcUD2mByacE5jgY50NGy9fHppXVobhI2EmuKsrzEyDf7kJgo/i1E90Rvq1HROaru6Y2PwLcPeCSU16eNbjpfsyRyyQicSTROUMPTXA8y0KMBWsLtX1ssQwNMGSth0GLJ44fMjCSc27dzKY1Dlh+Kk0gd8xXeFThB0m7BIWmzD8rzHhShNiMjKaMDgxjPRrceJzSPkG2C/oCrQ8lKinerbABw6b/ArUdHVJ/4eE34HzwTFgf6CPAsYSiq+pG6JOUn9X5dFbVov6pecopPcD6gdLz23E3wKlaChv2UtLCfTWtAWXbLdJ56Tmt5c2rLdohck82xWaOSGDSWGQmQLGmEwwFCdsNEFGGECcVknQYAKuKNAPoZPCAc4kn1A3FpCDpCns0Iiw+k9arLA7vM2DIBgARoLJYDq4B9wILgPiU7mMFlBoJFNvQY0KLyCvSF/szCSyDNm9wCFAemYQ3gumAek5glDzwJoGakP+r8BGY3HaT9kS6oAnO1W9mKExWmdddb1eYW0tkNZhowNOcqIbcKAHgD6TK1ty5GaDK8DRYEewGRBp2udgIvqMLomedmTHg92AXi2aFtqBjHog7Em4IfxXCOuKGs9/fDFNXHwrYbHDsAv5ThOaJ8MwvDvU6LExl9FUPhfeMaHp2mudleGQ9VYu7T+otf2ghFq9WC+2QFqHjb9he8Wl4ZyvgceAHghzCN/pFQVLWYggwM1C8zAOt4Qu6QuhCf9CfAbcH+KYF+DJJ2ZMeGAmDLdvyCzfbNOt29dtbGlvbGyduy0OecCglvYTGlvmjm1sbb+msXXu9EEt82YPaGt/vn/bE+W6ESlL6sXXlAUSOyxPcDVF9SbLlfWxXGStDqt88Y2t7cNBv0Gtc7fCAfcgflRj69yzG1vaLx3UMveGgS3tdw1sbX98k3GPLgiONCurfHqvrpdbILHDch3R5vCCIAj0FQ5sT94C3gK1skClDvtkrQq4ps5Di+JhYKMv58pE4jBgo5dyMvEQ4QuBja6JyiLwGoiTyrReVC4aR/hOEKeC3TxInAps9J2orlwcwb0B0778FtNyWFqw8jShjZbBtK5Og689uVYQ2uiM3PnjIcLXAReVrZdkvAukIW1NNIcMo0BDvDw6hr8YlKJ3SXwR3A+0XdIYQq3OU/ZUSOOwvbL/mupq6194Jy7hZlATolJ9hhPdDmz1hC610eChVrBpJZutea59uS4jv42uhGlzAHW1fkRaEVEeyWteuSitm6EpPW1f1H1YlUBfk2km5Ea0PUQZtCCIaCrSQ3ZLcuhhr/lw2eQldGl7YJttEbVTGuFok1hTOnaNntvTFjiCG6056R49D+fYkBPMAv2Ajc6nW6SPDwyhnIyBMZuYORZdmmPPJ3KszyNHmDwnH5HTj0KfHgZ5ZiSikW5tuBdhFUU1Z1/ErBJDMxHzKP+mVdAnHT9Fz5/Qp5kOouUpkcOiUHJfjKgr2/SIyPpo9S1wCffkkOqr/UAjulWBtKxUG+h9wCz8zc6vF7LMOI7nAxtpHXiUHz/OpV2Jsz6TO7CEx1l4cdbx3eWP86t1rK/CJlZLGXr2ACeDRCRHTCKoG5dbkqgNw7V/cJJ8XqZnLCCHmk7F3KZn1Js2Y8yBwEbaREBbyxak4Wj6nLKI3y3URFlHKE54LGHBG5djkZxd51W8COTTGz/J10hqwmo+vkhHGcatpI+PQNv1ulbnHY5cEnoIoTlAi4TeJXTRZK4v0Uq0pA4b7b8+y81hwt51bs+vkQU+zHk0gLIJYdWIiiOnaHUo/Bv8Q7n/aroSLST42o/6lkJu/uhKdGugRf23PDMSOYn8cvoIqyB6JEfaHoggT68R+weIkx4KcV65Y62qa6MMOWgbXpfj9+dakjiY+vh7olMbDeqBo1V+tnJoynSkLSHOS+qwvv8at1zvONbH/TOpPPGKXFHp0KMvsVwOJ+fYl8pXblGKPjhYYimANp7X28Y2anwLeuXslmx5lq05fCepWndOUEDq52vAq4BZwUHBCHsF+dUSymbj+laCKziYCmwU9TFbepaXd9jskfsn+ob1/Ve3ndZEikaOr09xYteAjgZzVPn15o6rUx45a2c8IX5MpVwE72xgIw3axPnaQO+sODN6zINEn1+qrxdlKz6THw2MERSQ3mZqKRQwKzhoceRZwnUudqSVY//SIRAdI3KIGFOJw/oRYqc5q5ogJ0mqUCOx30sq7JBTc831wURAnuhDm0M3UZmnkaq3KUFZGoO8vvQqJahpI5UhKqOxFP0XiT/DXArilLZZfCsPhgJCoWtDBE1JkVyWbPfwZUeu6jgsV6D2tZpeufOoA52L+7C2Flhe4nSXk2YbzImPN8QrPtmypLnCbMTxcw11Ic2XRJpeKVVenWYezupqIio9B1tz+D7yvgfUn5bj5mRz4QGUV62G3HG1Qn3+qZ07K9Vne7hIl/rF8jXFnUjyho0+WTswkF+S6DRnjyfcwRnUbyOwkm1S3+WgVgUlmI2k6R+eEZQn6om2BnKO+qJhBdAiAgI34XR6CNkWQ0TtYGsWa5GFzdHdJyudohHjSxDRV2V6uxOtiGxdDil6B5uV9a0kDhvtDPv+q0y7Cup/mVWH+ZjrpkhgA/1YYBuoiYupiaXR0jTdkmo5rMpyJg6UqOkmYaBBFtcU4FVU0CSDOi6n08OLU2RJGyRkI7GftM3iWPaCw+co7zhQbtAtmslm+y2jApG46z9jRERMoj5s9A2bpqIUnKi3HFDhdgGzLYgP4esJbSt2tJmnvZZt82uN6Hc1H7e2KYWnKROCPAX52KoI9SXQ1Id289C85aqU5DE5fSlp9Sf3QcD2wbvKdD3XphCR0kRh1Vx93iHlcuS8OOfRPfh6nlEYmU96lmBroIugiL6EgJZXFiVYGNocQdfleiDthC7bv0W1qCrJci2t/HvJXN2Ja+MbVm9FjTjGoeVyWbNwY7Qh92ezB8U/+SchFVKV37Y9q278pHhW9GqnjK/G+d3HiR+GnFd7PGvrnDRP++7TGJUtF4+HT8PYDv33E2oRAUERaU5R+28VJfQAQ/+aRQshVke1tilKnJ9rlw3+6MiQuEvQnV/1Ixvl3meABgZdq5qeywqW+SnpsJxA6X3qDYs99MTXk59oAZ3L9R4CtGOF1sXa1tAu5obGt2N1OdpZ6LoDaKncCEINVGjAQjYtODEHekvnHwQclyXKoRusyfb4oFK5vPlKFBOUkw5H76vd/CmErq+OtIVtVRdscC4buZrDNlkXT9sYudJc/KKHbbegPi7I/Z+nblbJ4BzuexvQmmFNiWlg0JZBA1H6uMCWVsCzVZ6owOc4iC5JLLXOE9HeT1RIDXbYKqJWrvyeK9A0wWmENrJdvz6Lk8Ft8lqOpykO9be+j4BrgYP2r0rreIZruRedZ4I05HrDzkJf/o1N/H2U6o1AUEQafU06tVGUOcpwxankmkv9mis9BX9zdO2SQl521RdIrv3CLkafmupJVGo++iIERwPVLwIradP9RFsalXPY6NtVne7UlcpavDXPPJciyHEJEpOcsugrGSq23tir8ybQ2twJiUsRE+T8ehOqRRBLWf1DdOtrnPh/CswpPo6KqyZ+7rjaoRY+2FYraXRY4w026IFrK0clg08aEbbpUp9YU1a2tEp4t2Pnm5JmLOew0RFiV9Mv6bl6jRwG0jSAFnCrL5ikXHr6HUS+eTZh+No8Tk0lydlEbDxNDVxLwuHkdzVTSU5EegDpbZtIOKVQqTe4BqBcrYaUpykSd035aBmj9u4qAhpcq4iO5uGSqpzcE/Vj1Z9FbRFdlFZfkQZj5E+6RtUbS7KdVc5ho/0UffNo11KHXG6InsZa2fNtiq/FIOpHEs2TmodyUPWBBiNfcuUO6dq6VetlJa98tpFLjfCq76m34qfJcxbQIFj+pJVE0KGWj/qzqgSVqHDmQbfuu8sR9BWX7b8JOvUlScAZNNC0t0VWDzY9bC1JWZbWI9vGJ9SE/0pWIt2Pq+Wjvc2cu2JYTqE5XH2583PStLPHrth1GLgJpGrplXNYrS1VxdOE9Gbc/wAAAT5JREFU7nRO1qcIYy0H1wFtuaq5U63o0mjxIHjaKrWJUFu5JjIqsiuA5JVPlU5zrp/HaDuDRtI2ANuA00HJrWFJ117PBAWkOVhUFRNSmnhXJSBaQBqHyGcg5RRgI/3/orxcNILwscBFGkyLihfEyXQYsJFzkAXhhSAD4iSe8wGH8NtgHWCj7FwtCQcAG2mT+njZb7UJdvM0dpGV51h7chM4aSNSNKCn/3V8NfEHsxkr+Ik6bFF2FMth9RbaknjS5mORnnphcI3zgZbLVeVa0aWN0fU54sPENUpYL6bw5eylFijpsCozFW0psE2iK9nDW8BboIYWKOuwNSyLP5W3gLdAGQt4hy1jIJ/sLdCbLOAdtjp3w2vxFqiJBbzD1sTM/iTeAtWxgHfY6tjRa/EWqIkFvMPWxMz+JN4C1bHA/wEAAP//c8QLbQAAAAZJREFUAwAk9QXTSJCVFwAAAABJRU5ErkJggg==",
     "yard_off": "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAADJklEQVRoge1Zz2vUQBT+ZkbaLmFLwVYQxNWTiKXHnvwDCt4LXoSFNHsriGcFFcFLqfRS2k1b8CLs3b/Ak3qSKtJja3tx/dmy3bZu5nloUmfHTTaTZNda8p3e5M37Zl5mvvmRADly5MiRIwVYFiQLCwuDlmXdA1CKGbLZaDTmZmdnD9O2fS4tAQAUCoW7RPTEMEYCeJq2bZ6W4F8jkxFoNpvzlmVxGEyh/f39+Sza/u8RKWJdnER0GcAlxtgGgK8Z9+U8EV0DsM0Y2/KfdRV75BQKEycRjafrayTGiUjtQ6TYz7aINXEOEdGdwMcYewFgL6N+FInotsL9HMABYog99kZWq9XE7u7uIQABAFLKScdx3ibscBtc150E8NovesPDw4PT09NenNjYU8gn/B6UGWNjRr2Mhsr1LW7nAXMN1AMjywQ0rnpoxQ4w3cjqAK77dlsCypKLTktfF/8JFxH1PIG/GgXal9xOS1+UX0o5xtixHDnnRgkYTSH17ehTiHN+tZMdx69ymY6AUQLa2+mViHuXgEpORG0JkLJ9qnZMf38S0IZXH4E3IXYcf3+mECJEbNv2qpRySko5Zdv2qh7YxZ94BIyulNVqdYIx9i4oCyEK5XL5wIRDx9ra2pDneU2Fc6JcLq/HjTdaRqWUdSHESbnVao0C2AaA5eXlG5zzl369W47jfFBjw/y6ltBjEX8BoIpxNLCFEA6OD30l325DmF9KOapUo6OjI6N7hlEClUrlF4CfQVnbC4ZC7Ei/xvHDbyM2ktwHsj4PJRYwkCABxljYSnQQYnfz9zeBsL2AiKoANgFs+rYe19EvpUyVQJLPKh2nkG3b7wFcCQsK86c5SgMpNaC9vaRIvAsDp0zEpkdpIEMNpMDpEHEK9DcBzvlnpTiyuLh4wZQjwNLS0kUAI0E5iQaMVyHP8zaEEA0AFgA+MDCw7rruJ1MeHyX8OVDuCSE+mhIk+sGxsrLyiIjuJ4kNAxE9mJmZeWwal+jTYrFYfEhEzwDE/n4TAY8xNrezs2P0gyRAql9MruuWGGM3pZRWknjOeaPVar2qVCpb3WvnyJHjTOI3k9F2MT74VMIAAAAASUVORK5CYII=",
     "yard_on": "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAADmklEQVRoge1ZTWgTURD+5m2btpTUgkmbVDH2IEWUHiu2Ch4rnhW8eNSbIB6lIfYHvJSKV6EHL4KexaugNqh4kCpSPEhrtdb4UxNqf/eNBzfZt2my2be7qRTynd5m8r6Z2fl5s7tAAw000EADAUBhkHy4c7Ylms9fBzjlUe18oaNj8sjVxxtBdTcFJQCAaH7lGpgmvO9gRPMrEsCtoLpFUIL/jVAiUOjonIrm80IvhfZNhaF7z8O1iMuLk5kOEfFBljRHgn+EaQhL2k+C+5hpkYgXLPNqFrtrCpUXJ4EBBoj4ODgs0y1usrihctcu9gBFHKYH/rlcI6AWJzG1MviSLaX7IBR8a3aAomBcLF4x6B4Rr3spds8HGT84byzPfd4AYAAAMwaS6ZlXvm1WsDR+coCYXliXZnffgRa68ND0stdzClmEv+wfKK5lpSu5g+unV+MB/RrI2UoRngOmwsWcc/nnDmgdZATkGDgKAALS4YDdcoFKrc9VThQvFTJR/RyQjBwVq0Y6U0htuZVan5tcQMbZKkdSo+wBeikk7PDyjhSi3sprD3KlBmRdHWChkodWAyz914CWAwSVnJ0OMHHFtRe5I5qinhFQu1BZG2X5suLak9y+GSTqmkJKBNiZQol0dpokD5Pk4UQ6O12+1V1OvlNI65FyeeJEP0vjTfF6zYy09WaerOtwlONj5kxrm7G5VvqBuT+Rzs563a/VRgUiORP2IdmMtRiARQBYGh06RsSP/tlA55Lp5+/UvdXkkSYZV2c5Ibfrl0Kx2J/vUEbHSLMRK64JfBlACkDKWjtQTd4st2LK3zielFrPGXpd6MrrLQC/S9q2ldwVaK24riFnpRkQsGLp8Aw/zwPKYSaDnwXqIcZ6HQgI6ICjf0usV1zXkLMyU5HmHAT4ccBxl5QUMnAXwDyAeWvtRDW5Y6bSa6GAn9cqArlSGSsRSNyYeQvgcLVtVeXOmWo3IqDcJRnKQ41yiO1KDQiliDkEB9ROpp9C2g6QEgERwkTKrMxBmoOcZYO2RjsCITggyP8oDfiJAOGbctn5NTPYpctRRG7idJKBzhK3Dwe0u9C23JwTRmQVoHYAAgZml8cGP+nyAIApzRTsgbKwKlve63L4+sCxNDY0SuARP3urG8Lp7pHsmO4+X68WE309N8F0G4Dn9zcuMBmY7DKzGh9IbAT6xPRlfDBlgE5BcrsvAkGr5jY97ck8WwhiRwMNNLCH8Rf+Zo91b9wWQwAAAABJRU5ErkJggg==",
     "restore_off": "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",
@@ -465,6 +466,9 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.2.7", [
+        "Junkyard has a logo! It sits at the top of the window. Click it to open the Junkyard page on GitHub.",
+    ]),
     ("1.2.6", [
         "When you click Run, the plan of what's about to happen now shows in orange, so it's easy to check before you Confirm.",
         "Change anything after that and the plan clears, so you never confirm an old one.",
@@ -781,8 +785,14 @@ class Junkyard(object):
 
         self.win = self.disp.AddWindow(
             {"ID": "JunkyardWin", "WindowTitle": "%s %s" % (APP_TITLE, APP_VERSION),
-             "Geometry": [200, 120, WIN_W, WIN_H], "MinimumSize": [780, 660]},
+             "Geometry": [200, 120, WIN_W, WIN_H], "MinimumSize": [780, 700]},
             ui.VGroup({"Spacing": 6}, [
+                ui.HGroup({"Weight": 0, "Spacing": 8}, [
+                    ui.Button({"ID": "Logo", "Flat": True, "Weight": 0, "MinimumSize": [128, 36],
+                               "MaximumSize": [128, 36], "IconSize": [118, 30],
+                               "ToolTip": "Junkyard by Cutting Room Tools. Click to open the Junkyard page on GitHub."}),
+                    ui.HGap(0, 1),
+                ]),
                 ui.HGroup({"Weight": 0, "Spacing": 8}, [
                     ui.Label({"ID": "UpdateMsg", "Weight": 1, "WordWrap": True, "Text": ""}),
                     ui.Button({"ID": "UpdateNotes", "Text": "What's new", "Weight": 0,
@@ -827,6 +837,14 @@ class Junkyard(object):
 
     def setup_controls(self):
         s = self.settings
+        try:
+            logo = self.icons.get("logo")
+            if logo:
+                self.it["Logo"].Icon = self.ui.Icon({"File": logo})
+            else:
+                self.it["Logo"].Text = APP_TITLE.upper()
+        except Exception:
+            self.it["Logo"].Text = APP_TITLE.upper()
         loc = self.it["Location"]
         for label in LOCATIONS:
             loc.AddItem(label)
@@ -893,6 +911,7 @@ class Junkyard(object):
     def bind(self):
         on = self.win.On
         on.JunkyardWin.Close = self.on_close
+        on.Logo.Clicked = lambda ev: reveal("https://github.com/%s/junkyard" % GITHUB_USER)
         on.TabYard.Clicked = lambda ev: self.show_page(0)
         on.TabRestore.Clicked = lambda ev: self.show_page(1)
         on.TabReport.Clicked = lambda ev: self.show_page(2)

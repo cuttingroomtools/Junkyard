@@ -1,9 +1,8 @@
 {
-  "version": "1.2.6",
+  "version": "1.2.7",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "9ab55cee01a0dd4a8ef7dac5283f78f28c4cf488a3250b7490fee65cbc9f025c",
+  "sha256": "4a1c7d9532e3cbe2a1b70367c4da759fb04588ea1ddf7a0af3fdc16596911301",
   "notes": [
-    "When you click Run, the plan of what's about to happen now shows in orange, so it's easy to check before you Confirm.",
-    "Change anything after that and the plan clears, so you never confirm an old one."
+    "Junkyard has a logo! It sits at the top of the window. Click it to open the Junkyard page on GitHub."
   ]
 }

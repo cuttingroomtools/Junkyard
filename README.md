@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/brand/junkyard-readme-header.png" alt="Junkyard" width="720"></p>
+
 # Junkyard
 
 Flag your junk footage in DaVinci Resolve Studio, then send the source files to the yard to free up space.
@@ -46,4 +48,4 @@ Junkyard only moves files unless you choose Burn Pile, which asks you to type FU
 
 ---
 
-© 2026 Joel McDowell. Free to use. All rights reserved. Provided as is, with no warranty.
+A [Cutting Room Tools](https://github.com/cuttingroomtools) project. © 2026 Joel McDowell. Free to use. All rights reserved. Provided as is, with no warranty.
