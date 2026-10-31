@@ -9,13 +9,13 @@ Flag your junk footage in DaVinci Resolve Studio, then send the source files to 
 - Restore puts the last run's files back
 - One-click updates
 
-<img src="docs/images/2-yard-list.jpg" alt="Junkyard in DaVinci Resolve" width="640">
+<img src="docs/images/2-yard-list.png" alt="Junkyard in DaVinci Resolve" width="640">
 
 ## How to use
 
-1. **Flag your junk.** In the Media Pool, right-click a clip › Flags › Cocoa.
+1. **Flag your junk.** In the Media Pool, right-click a clip › Flags › Cocoa. (Working on a timeline? Use Clip Color › Brown and set Find junk in to Timeline.)
 2. **Open Junkyard** from Workspace › Scripts › Junkyard, pick your all-footage timeline and hit Refresh.
-3. **Pick what happens** (every option starts off), click **Run**, check the plan, then **Confirm**.
+3. **Pick what happens** (every option starts off), click **Run**, check the plan (shown in orange), then **Confirm**.
 4. **Changed your mind?** The Restore tab puts the last run's files back.
 
 ▶ [Watch the 1-minute walkthrough](docs/junkyard-walkthrough.mp4) · 📖 [Full guide with screenshots](docs/how-to-use.md)
