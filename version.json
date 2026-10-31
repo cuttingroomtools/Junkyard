@@ -1,8 +1,8 @@
 {
-  "version": "1.2.9",
+  "version": "1.3.0",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "79a1dc8aa716001cbbb0011a2be4e47ddbdd0a4e25f91d7076cb334eb4febd0e",
+  "sha256": "31d74037ce7a3b50dd5bc61734ff69e8505d6cbf1e66af07917a167dcb0fa966",
   "notes": [
-    "Fixed the Refresh button getting cut off at the right edge of the window."
+    "A cleaner header: just the JUNKYARD wordmark at the top left."
   ]
 }
