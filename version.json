@@ -1,8 +1,8 @@
 {
-  "version": "1.2.8",
+  "version": "1.2.9",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "0e993d56932beb52c77c9fe7e72d717f890ee588d05b66a4f80881af0324712f",
+  "sha256": "79a1dc8aa716001cbbb0011a2be4e47ddbdd0a4e25f91d7076cb334eb4febd0e",
   "notes": [
-    "The logo now sits along the top: JUNKYARD in off-white on the left and the orange flag on the right, with less empty space above the options."
+    "Fixed the Refresh button getting cut off at the right edge of the window."
   ]
 }

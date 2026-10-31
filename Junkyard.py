@@ -65,7 +65,7 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.2.8"
+APP_VERSION = "1.2.9"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
@@ -467,6 +467,9 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.2.9", [
+        "Fixed the Refresh button getting cut off at the right edge of the window.",
+    ]),
     ("1.2.8", [
         "The logo now sits along the top: JUNKYARD in off-white on the left and the orange flag on the right, with less empty space above the options.",
     ]),
@@ -700,8 +703,8 @@ class Junkyard(object):
             ]),
             ui.HGroup({"Weight": 0, "Spacing": 10}, [
                 ui.Label({"Text": "Timeline", "Weight": 0, "MinimumSize": [120, 0], "MaximumSize": [120, 40]}),
-                ui.ComboBox({"ID": "Stringout", "Weight": 1, "ToolTip": "Your all-footage timeline. It's ignored when checking where clips are used, and it's where Cut and delete gaps happens. When finding junk in a timeline, this is the one that's scanned."}),
-                ui.Button({"ID": "Refresh", "Text": "Refresh", "Weight": 0, "MinimumSize": [110, 0], "ToolTip": "Re-scan after marking more clips."}),
+                ui.ComboBox({"ID": "Stringout", "Weight": 1, "MinimumSize": [200, 0], "ToolTip": "Your all-footage timeline. It's ignored when checking where clips are used, and it's where Cut and delete gaps happens. When finding junk in a timeline, this is the one that's scanned."}),
+                ui.Button({"ID": "Refresh", "Text": "Refresh", "Weight": 0, "MinimumSize": [110, 28], "MaximumSize": [110, 28], "ToolTip": "Re-scan after marking more clips."}),
             ]),
             ui.Tree({"ID": "Tree", "Weight": 1, "SortingEnabled": True,
                      "Events": {"ItemChanged": True, "ItemClicked": True}}),
