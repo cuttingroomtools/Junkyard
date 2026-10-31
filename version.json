@@ -1,9 +1,9 @@
 {
-  "version": "1.2.5",
+  "version": "1.2.6",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "cbb5173325514727aa5e0331327eef9735c777355208caff13d45328fa3a90d2",
+  "sha256": "9ab55cee01a0dd4a8ef7dac5283f78f28c4cf488a3250b7490fee65cbc9f025c",
   "notes": [
-    "A quick How to use guide opens with Junkyard. Tick \"Don't show this again\" to hide it.",
-    "Bring the guide back any time with the How to use button on the Report tab."
+    "When you click Run, the plan of what's about to happen now shows in orange, so it's easy to check before you Confirm.",
+    "Change anything after that and the plan clears, so you never confirm an old one."
   ]
 }
