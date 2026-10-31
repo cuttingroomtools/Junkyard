@@ -65,7 +65,7 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.2.5"
+APP_VERSION = "1.2.6"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
@@ -465,6 +465,10 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.2.6", [
+        "When you click Run, the plan of what's about to happen now shows in orange, so it's easy to check before you Confirm.",
+        "Change anything after that and the plan clears, so you never confirm an old one.",
+    ]),
     ("1.2.5", [
         "A quick How to use guide opens with Junkyard. Tick \"Don't show this again\" to hide it.",
         "Bring the guide back any time with the How to use button on the Report tab.",
@@ -998,13 +1002,25 @@ class Junkyard(object):
         s["dest"] = (self.it["Dest"].Text or "").strip()
         save_settings(s)
 
-    def status(self, text):
+    def status(self, text, plan=False):
+        # plan=True: the "here's what will happen" preview, shown in orange
+        self.it["Status"].StyleSheet = "color: %s;" % ACCENT if plan else ""
         self.it["Status"].Text = text
 
+    def rstatus(self, text, plan=False):
+        self.it["RestoreStatus"].StyleSheet = "color: %s;" % ACCENT if plan else ""
+        self.it["RestoreStatus"].Text = text
+
     def disarm(self):
+        was = self.armed
         self.armed = None
         self.it["Run"].Text = "Run"
         self.it["RestoreRun"].Text = "Restore these files"
+        # a plan shown in orange is stale once anything changes
+        if was == "run":
+            self.status("Plan changed. Click Run to see what will happen.")
+        elif was == "restore":
+            self.rstatus("")
 
     # ------------------------------------------------------------------ yard
 
@@ -1224,9 +1240,11 @@ class Junkyard(object):
         if self.armed != "run":
             self.armed = "run"
             self.it["Run"].Text = "Confirm"
-            self.status(self.describe(sel, o))
+            self.status(self.describe(sel, o), plan=True)
             return
+        self.armed = None           # confirmed, so the plan isn't stale
         self.disarm()
+        self.status("Working…")
         self.remember()
         if o["Burn"]:
             self.open_burn_dialog(sel, o)
@@ -1516,12 +1534,12 @@ class Junkyard(object):
         if self.armed != "restore":
             self.armed = "restore"
             self.it["RestoreRun"].Text = "Confirm restore"
-            self.it["RestoreStatus"].Text = "Put these files back where they came from?"
+            self.rstatus("Put these files back where they came from? Click Confirm restore.", plan=True)
             return
         self.disarm()
         msg = self.restore(last, rows)
         self.load_restore()
-        self.it["RestoreStatus"].Text = msg
+        self.rstatus(msg)
 
     def restore(self, last, rows):
         project = self.project()
