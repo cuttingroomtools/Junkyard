@@ -65,7 +65,7 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.3.1"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
@@ -466,6 +466,10 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.3.1", [
+        "More breathing room around the JUNKYARD logo, lined up with everything below it.",
+        "The \"Updated\" message after an update is shorter, so it no longer gets cut off.",
+    ]),
     ("1.3.0", [
         "A cleaner header: just the JUNKYARD wordmark at the top left.",
     ]),
@@ -611,7 +615,7 @@ def install_update(info, path):
         os.replace(tmp, path)
     except Exception as e:
         return False, "Couldn't install the update: %s" % e
-    return True, ("Updated to %s. Close Junkyard and open it again from Workspace › Scripts."
+    return True, ("Updated to %s. Close and reopen Junkyard to finish."
                   % info["version"])
 
 
@@ -796,9 +800,10 @@ class Junkyard(object):
             {"ID": "JunkyardWin", "WindowTitle": "%s %s" % (APP_TITLE, APP_VERSION),
              "Geometry": [200, 120, WIN_W, WIN_H], "MinimumSize": [780, 700]},
             ui.VGroup({"Spacing": 6}, [
+                ui.VGap(10),
                 ui.HGroup({"Weight": 0, "Spacing": 8}, [
-                    ui.Button({"ID": "Logo", "Flat": True, "Weight": 0, "MinimumSize": [116, 34],
-                               "MaximumSize": [116, 34], "IconSize": [107, 26],
+                    ui.Button({"ID": "Logo", "Flat": True, "Weight": 0, "MinimumSize": [107, 40],
+                               "MaximumSize": [107, 40], "IconSize": [107, 26],
                                "ToolTip": "Junkyard by Cutting Room Tools. Click to open the Junkyard page on GitHub."}),
                     ui.HGap(0, 1),
                     ui.Label({"ID": "UpdateMsg", "Weight": 1, "WordWrap": True, "Text": ""}),
@@ -807,6 +812,7 @@ class Junkyard(object):
                     ui.Button({"ID": "UpdateGo", "Text": "Update", "Weight": 0, "MinimumSize": [130, 28],
                                "ToolTip": "Download, check and install the new version. Your current version is backed up first."}),
                 ]),
+                ui.VGap(14),
                 ui.Stack({"ID": "Pages", "Weight": 1}, [yard_page, restore_page, report_page]),
                 ui.HGroup({"Weight": 0, "Spacing": 18}, [
                     ui.HGap(0, 1),
@@ -849,6 +855,7 @@ class Junkyard(object):
                 path = self.icons.get(key)
                 if path:
                     self.it[bid].Icon = self.ui.Icon({"File": path})
+                    self.it[bid].StyleSheet = "border: none; padding: 0px; margin: 0px; background: transparent;"
                 else:
                     self.it[bid].Text = fallback
             except Exception:
