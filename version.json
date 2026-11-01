@@ -1,9 +1,8 @@
 {
-  "version": "1.3.1",
+  "version": "1.3.2",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "711af47446d4047e7a78f7d777269e5e8ee85215fabe351a3fc71210aaaa43e3",
+  "sha256": "5f897d539ae7a147c26d6bc10ca1561c61168e9682c774715683697ee838c411",
   "notes": [
-    "More breathing room around the JUNKYARD logo, lined up with everything below it.",
-    "The \"Updated\" message after an update is shorter, so it no longer gets cut off."
+    "The JUNKYARD logo sits higher, with more space between it and the options below."
   ]
 }
