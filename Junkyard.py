@@ -39,7 +39,8 @@ Safety
 - Clips used in other timelines start unticked and are marked in orange.
   If you tick one anyway it is never removed from the Media Pool.
 - Restore tab: puts the last run's files back and relinks or re-imports
-  the clips. It can't put clips back into the all-footage timeline.
+  the clips. Before a timeline cut, a copy of the timeline is saved, so
+  you can go back to it.
 
 Install
 -------
@@ -65,7 +66,7 @@ import datetime
 import subprocess
 
 APP_TITLE = "Junkyard"
-APP_VERSION = "1.3.2"
+APP_VERSION = "1.3.3"
 YARD_FOLDER_NAME = "_JUNKYARD"
 JUNK_BIN_NAME = "JUNK"
 RESTORE_BIN_NAME = "Junkyard Restored"
@@ -412,6 +413,42 @@ def pool_by_path(mp):
     return pool
 
 
+def point_at(mpi, new_path, proxy=None):
+    """Point one clip at a file. RelinkClips can report success and change nothing,
+    so swap the file with ReplaceClip, with the proxy unlinked while it happens."""
+    proxy = proxy or proxy_path(mpi, clip_path(mpi))
+    if proxy:
+        safe_call(mpi, "UnlinkProxyMedia")
+    safe_call(mpi, "ReplaceClip", new_path, default=False)
+    if proxy and os.path.isfile(proxy):
+        safe_call(mpi, "LinkProxyMedia", proxy)
+    return clip_path(mpi) == new_path
+
+
+def pool_snapshot(mp):
+    """Every clip's file path, keyed by its unique ID."""
+    snap = {}
+    for mpi in walk_pool(mp.GetRootFolder()):
+        uid = safe_call(mpi, "GetUniqueId")
+        p = clip_path(mpi)
+        if uid and p:
+            snap[uid] = (mpi, p)
+    return snap
+
+
+def put_back_strays(mp, before, expected):
+    """Clips Junkyard didn't mean to touch must keep their paths. Put back any that moved.
+    expected: unique IDs of clips Junkyard repointed on purpose. Returns (strays, fixed)."""
+    strays, fixed = [], 0
+    for uid, (mpi, old) in before.items():
+        if uid in expected or clip_path(mpi) == old:
+            continue
+        strays.append(os.path.basename(old))
+        if os.path.isfile(old) and point_at(mpi, old):
+            fixed += 1
+    return strays, fixed
+
+
 def find_bin(mp, name):
     root = mp.GetRootFolder()
     for sub in safe_call(root, "GetSubFolderList", default=[]) or []:
@@ -466,6 +503,12 @@ CHECK_EVERY_HOURS = 12
 
 # Newest first. Shown once in the What's new window after each update.
 RELEASE_NOTES = [
+    ("1.3.3", [
+        "Fixed: moved clips could stay offline after Relink, showing only their proxies. Relink now points each clip straight at its moved file.",
+        "Fixed: a run could take other clips in the same folders offline. Junkyard now checks every clip after a run and puts back any that Resolve changed.",
+        "Before Cut and delete gaps, Junkyard saves a copy of your timeline, so you can go back to it.",
+        "Moved .SRT files that are in the Media Pool are relinked too.",
+    ]),
     ("1.3.2", [
         "The JUNKYARD logo sits higher, with more space between it and the options below.",
     ]),
@@ -749,7 +792,7 @@ class Junkyard(object):
                          "Text": "Gather them in a %s bin" % JUNK_BIN_NAME}),
             ui.CheckBox({"ID": "Remove", "Weight": 0, "ToolTip": "Removes the clips from the Media Pool. Clips used in other timelines are always kept so those edits don't break.",
                          "Text": "Remove them from the Media Pool"}),
-            ui.CheckBox({"ID": "CloseGaps", "Weight": 0, "ToolTip": "Cuts the junk clips out of the chosen timeline and ripples everything up. Restore can't undo this part.",
+            ui.CheckBox({"ID": "CloseGaps", "Weight": 0, "ToolTip": "Cuts the junk clips out of the chosen timeline and ripples everything up. A copy of the timeline is saved first, so you can go back to it.",
                          "Text": "Cut and delete gaps in the chosen timeline"}),
             ui.VGap(4),
             ui.HGroup({"Weight": 0}, [
@@ -1371,7 +1414,7 @@ class Junkyard(object):
             text += "\n⚠️ %d ticked clip(s) are used in other timelines and will stay in the Media Pool" % len(risky)
             text += (", but those edits will go offline." if o["files"] and not o["Relink"] else ".")
         if o["CloseGaps"]:
-            text += "\nRestore can't undo the timeline cut."
+            text += "\nA copy of the timeline is saved first, so you can go back to it."
         if o["Burn"]:
             return text + "\n🔥 Click Confirm, then type %s in the pop-up." % BURN_PHRASE
         return text + "\nClick Confirm to go."
@@ -1381,11 +1424,21 @@ class Junkyard(object):
         mp = project.GetMediaPool()
         notes = []
 
-        # 1. Cut and delete gaps in the chosen timeline
+        # 1. Cut and delete gaps in the chosen timeline, after saving a copy of it
         stringout = self.stringout()
+        backup_name = None
         if o["CloseGaps"] and stringout:
             items = [it for r in sel for it in r["string_items"]]
             if items:
+                current = project.GetCurrentTimeline()
+                name = "%s (before Junkyard %s)" % (stringout.GetName(), now_stamp())
+                if safe_call(stringout, "DuplicateTimeline", name):
+                    backup_name = name
+                    notes.append("saved a copy of the timeline as '%s'" % name)
+                else:
+                    notes.append("⚠️ couldn't save a copy of the timeline first")
+                if current:
+                    safe_call(project, "SetCurrentTimeline", current)
                 try:
                     ok = stringout.DeleteClips(items, True)
                     notes.append("cut %d clips and deleted the gaps" % len(items) if ok else "cut and delete gaps failed")
@@ -1393,8 +1446,10 @@ class Junkyard(object):
                     notes.append("couldn't cut the timeline clips")
 
         # 2. Source files
+        before = pool_snapshot(mp) if o["files"] else {}
         moved = {}          # original clip path -> new clip path
         moved_proxy = {}    # original clip path -> new proxy path
+        moved_other = {}    # original sidecar path -> new path (some, like .SRT, are in the Media Pool too)
         failed = []
         protected = []
         log_rows = {}
@@ -1440,6 +1495,8 @@ class Junkyard(object):
                         moved[clip] = dst
                     elif kind == "proxy":
                         moved_proxy[clip] = dst
+                    elif dst:
+                        moved_other[src] = dst
                 except Exception as e:
                     dst, root = "", plan[src][1] if o["MoveFiles"] else ("Burn" if o["Burn"] else "Trash")
                     status = "error: %s" % e
@@ -1455,22 +1512,32 @@ class Junkyard(object):
         targets = [r for r in sel if r["path"] in moved or not r["exists"]] if o["files"] else list(sel)
 
         # 3. Relink
+        repointed = set()   # unique IDs Junkyard pointed somewhere new on purpose
         if o["Relink"]:
             n, offline = 0, []
             for r in targets:
                 if r["path"] in moved:
                     new_path = moved[r["path"]]
                     for mpi in r["mpis"]:
-                        safe_call(mp, "RelinkClips", [mpi], os.path.dirname(new_path), default=False)
-                        if clip_path(mpi) == new_path:          # check Resolve really points at the new file
+                        repointed.add(safe_call(mpi, "GetUniqueId"))
+                        if point_at(mpi, new_path, moved_proxy.get(r["path"])):
                             n += 1
                         else:
                             offline.append(os.path.basename(r["path"]))
-                        if r["path"] in moved_proxy:
-                            safe_call(mpi, "LinkProxyMedia", moved_proxy[r["path"]])
+            for uid, (mpi, old) in before.items():
+                if old in moved_other:
+                    repointed.add(uid)
+                    point_at(mpi, moved_other[old])
             notes.append("relinked %d clips" % n)
             if offline:
                 notes.append("⚠️ couldn't relink %s (they'll show offline)" % ", ".join(offline))
+
+        # Moving files must never change any other clip. Check, and put back any that did.
+        if before:
+            strays, fixed = put_back_strays(mp, before, repointed)
+            if strays:
+                notes.append("⚠️ Resolve changed %d other clip(s), put back %d: %s"
+                             % (len(strays), fixed, ", ".join(strays[:5]) + (" …" if len(strays) > 5 else "")))
 
         # 4. JUNK bin
         if o["ToBin"]:
@@ -1509,7 +1576,8 @@ class Junkyard(object):
             dest = {"burn": "Burned", "trash": "Trash"}.get(action, os.path.dirname(log_paths[0]))
             if action != "burn":            # burned files can't be restored, keep the old restore point
                 self.settings["last_run"] = {"logs": log_paths, "project": project.GetName(),
-                                             "when": now_stamp(), "dest": dest, "action": action}
+                                             "when": now_stamp(), "dest": dest, "action": action,
+                                             "timeline_backup": backup_name}
                 save_settings(self.settings)
             ledger_add({"when": now_stamp(), "project": project.GetName(), "action": action,
                         "clips": len(moved), "bytes": freed, "destination": dest})
@@ -1595,8 +1663,9 @@ class Junkyard(object):
             except Exception:
                 skipped.append(os.path.basename(orig))
 
+        before = pool_snapshot(mp)
         pool = pool_by_path(mp)
-        relinked, to_import = 0, []
+        relinked, to_import, repointed = 0, [], set()
         for clip, kinds in restored.items():
             if "clip" not in kinds:
                 continue
@@ -1604,12 +1673,18 @@ class Junkyard(object):
             mpis = pool.get(now) or pool.get(orig)
             if mpis:
                 for mpi in mpis:
-                    if safe_call(mp, "RelinkClips", [mpi], os.path.dirname(orig), default=False):
+                    repointed.add(safe_call(mpi, "GetUniqueId"))
+                    proxy = kinds["proxy"][0] if "proxy" in kinds else None
+                    if point_at(mpi, orig, proxy):
                         relinked += 1
-                    if "proxy" in kinds:
-                        safe_call(mpi, "LinkProxyMedia", kinds["proxy"][0])
             else:
                 to_import.append(orig)
+        for r in rows:                  # sidecars that are in the Media Pool too, like .SRT
+            if r["kind"] not in ("clip", "proxy") and os.path.isfile(r["original_path"]):
+                for mpi in pool.get(r["moved_to"], []):
+                    repointed.add(safe_call(mpi, "GetUniqueId"))
+                    point_at(mpi, r["original_path"])
+        strays, fixed = put_back_strays(mp, before, repointed)
 
         if to_import:
             safe_call(mp, "SetCurrentFolder", find_bin(mp, RESTORE_BIN_NAME))
@@ -1632,6 +1707,10 @@ class Junkyard(object):
         if to_import:
             text += "; re-imported %d into the '%s' bin" % (len(to_import), RESTORE_BIN_NAME)
         text += "."
+        if last.get("timeline_backup"):
+            text += "\nYour timeline from before the cut is saved as '%s'." % last["timeline_backup"]
+        if strays:
+            text += "\n⚠️ Resolve changed %d other clip(s), put back %d." % (len(strays), fixed)
         if skipped:
             text += "\n⚠️ Skipped: " + ", ".join(skipped)
         return text

@@ -1,8 +1,10 @@
 {
-  "version": "1.3.2",
+  "version": "1.3.3",
   "url": "https://raw.githubusercontent.com/cuttingroomtools/junkyard/main/Junkyard.py",
-  "sha256": "5f897d539ae7a147c26d6bc10ca1561c61168e9682c774715683697ee838c411",
+  "sha256": "fc056b31e2d67393b445278267ceaf43b84eb7f12d585602cf43e1e61fa1087f",
   "notes": [
-    "The JUNKYARD logo sits higher, with more space between it and the options below."
+    "Fixed: moved clips could stay offline after Relink, showing only their proxies.",
+    "Fixed: a run could take other clips in the same folders offline. Junkyard now checks and puts them back.",
+    "Before Cut and delete gaps, Junkyard saves a copy of your timeline."
   ]
 }
